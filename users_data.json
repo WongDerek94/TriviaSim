@@ -1,3 +1,14 @@
 {
+<<<<<<< HEAD
     "user": []
+=======
+    "user": [
+        {
+            "userData": "sfsfsdf",
+            "scoreData": 1500,
+            "streakData": 1,
+            "date": "3/5/2018 18:48:47"
+        }
+    ]
+>>>>>>> 3d5320e351a4eaf8199c1f2ffca59de78430b8e6
 }
