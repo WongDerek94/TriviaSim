@@ -1,3 +1,5 @@
+const account = require('./models/account.js')
+
 /**
  * @desc Import database library and assign users as constant.
  * @type {}
@@ -116,7 +118,7 @@ app.post('/login', (request, response) => {
 })
 
 /**
- * @desc function send get request to render leaderboards.hbs page, successful responce renders the page
+ * @desc function send get request to render leaderboards.hbs page, successful response renders the page
  * @param {Object} request - Node.js request object
  * @param {Object} response - Node.js response object
  */
@@ -188,6 +190,51 @@ app.get('*', (request, response) => {
   response.render('404.hbs')
 })
 
+app.post('/validateusername', (request, response) => {
+  let userAccount = new account.Account()
+  userAccount.validateUsername(request.body.USERNAME.toString()).then((result) => {
+    if (result) {
+      response.send(true)
+    } else {
+      response.send(false)
+    }
+  })
+})
+
+app.post('/validatepassword', (request, response) => {
+  let userAccount = new account.Account()
+  result = userAccount.validatePassword(request.body.PASSWORD.toString())
+  if (result) {
+    response.send(true)
+  } else {
+    response.send(false)
+  }
+})
+  
+
+app.post('/register', (request, response) => {
+  let USERNAME = request.body.USERNAME.toString(),
+      PASSWORD = request.body.PASSWORD.toString(),
+      CPASSWORD = request.body.CPASSWORD.toString(),
+      userAccount = new account.Account()
+
+  userAccount.validateUsername(USERNAME).then((result) =>{
+    if (result && userAccount.validatePassword(PASSWORD) && PASSWORD === CPASSWORD) {
+      console.log('validation passed')
+      userAccount.register(USERNAME,PASSWORD).then((final_result) => {
+        response.send(final_result)
+      })
+    } else {
+      response.send(false)
+    }
+
+  })
+  
+  
+})
+
+
+
 /**
  * @desc function notifies port number of the local server
  */
@@ -195,20 +242,3 @@ app.listen(port, () => {
   console.log(`Server is up on port 8080`)
 })
 
-
-app.post('/validateusername', (request, response) => {
-  let USERNAME = request.body.USERNAME.toString()
-  db.executeQuery('SELECT "USERNAME" FROM "ACCOUNTS"').then((result) => {
-    user_array = JSON.parse(result)
-    var found = user_array.some(function (el) {
-      return el.USERNAME === USERNAME;
-    });
-    console.log(found,user_array)
-    if (!found) {
-      response.send(true)
-    } else {
-      response.send(false)
-    }
-  })
-  
-})
