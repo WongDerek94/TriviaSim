@@ -12,12 +12,6 @@ class Account {
    * @returns {undefined}
    */
   login (username, password) {
-<<<<<<< HEAD
-    
-    return undefined
-  }
-
-=======
     console.log(username)
     console.log(password)
     return new Promise((resolve, reject) => {
@@ -52,15 +46,11 @@ class Account {
     })
   }
 
->>>>>>> ae1071a4f77571f3ba1495602c4a536e7b84db28
   /**
    * @desc [To be determined]
    * @returns {undefined}
    */
   register (username, password) {
-<<<<<<< HEAD
-    return undefined
-=======
     return new Promise((resolve, reject) => {
       this.encryptPassword(password).then((result) => {
         db.executeQuery(`INSERT INTO public."ACCOUNTS"("USERNAME", "PASSWORD") VALUES ('${username}', '${result}');`).then((result) => {
@@ -96,14 +86,8 @@ class Account {
     if (numbers !== null && uppers !== null && lowers !== null && lengths) valid = true
 
     return valid
->>>>>>> ae1071a4f77571f3ba1495602c4a536e7b84db28
   }
 }
-
-database.executeQuery('SELECT * FROM public."ACCOUNTS"').then((result) => {
-  console.log(result)
-  console.log(typeof result)
-})
 
 module.exports = {
   Account
