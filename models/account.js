@@ -1,4 +1,5 @@
-const database = require('./database')
+const db = require('./database')
+const bcrypt = require('bcrypt')
 
 class Account {
   constructor () {
