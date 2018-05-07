@@ -31,8 +31,12 @@
     "sweetalert": "^2.1.0"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "babel-jest": "^22.4.3",
     "babel-preset-env": "^1.6.1",
+=======
+    "@types/jest": "^22.2.3",
+>>>>>>> cecbb2eaad124681164e944ad2ebe2ef7d8e0d18
     "install": "^0.11.0",
     "jest": "^22.4.3",
     "jest-cli": "^22.4.3",

@@ -9,7 +9,7 @@ overlayWindow.addEventListener('click', () => {
   }, 300)
 })
 
-loginWrap.addEventListener('click', () => {
+loginWrap.addEventListener('click', (event) => {
   event.stopPropagation()
 })
 
