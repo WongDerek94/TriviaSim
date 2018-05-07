@@ -23,11 +23,11 @@ let executeQuery = (query) => {
   })
 }
 
-let getUsersList = () => {
-  executeQuery('SELECT "USERNAME" FROM "ACCOUNTS"')
-}
+// let getUsersList = () => {
+//   executeQuery('SELECT "USERNAME" FROM "ACCOUNTS"')
+// }
 
 module.exports = {
   executeQuery,
-  getUsersList
+  // getUsersList
 }
