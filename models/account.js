@@ -9,7 +9,9 @@ class Account {
   }
 
   /**
-   * @desc [To be determined]
+   * @desc Provide desc later
+   * @param username - user's username
+   * @param password - user's password
    * @returns {undefined}
    */
   login (username, password) {
@@ -27,6 +29,19 @@ class Account {
     })
   }
 
+  // decrypPassword (password) {
+  //   return new Promise((resolve, reject) => {
+  //     bcrypt.compare(password, hash).then((res) => {
+  //     // res == true
+  //     })
+  //   })
+  // }
+
+  /**
+   * @desc Encrypts user's password 
+   * @param password - user's password
+   * @returns {Promise<object>}
+   */
   encryptPassword (password) {
     return new Promise((resolve, reject) => {
       bcrypt.hash(password, 10).then((hash) => {
@@ -36,8 +51,10 @@ class Account {
   }
 
   /**
-   * @desc [To be determined]
-   * @returns {undefined}
+   * @desc Registration of the user in the database
+   * @param username - user's username 
+   * @param password - user's password
+   * @returns {Promise<object>} 
    */
   register (username, password) {
     return new Promise((resolve, reject) => {
@@ -50,6 +67,10 @@ class Account {
     })
   }
 
+/**
+   * @desc [To be determined]
+   * @returns {undefined}
+   */
   validateUsername (USERNAME) {
     return new Promise((resolve, reject) => {
       db.executeQuery('SELECT "USERNAME" FROM "ACCOUNTS"').then((result) => {
@@ -63,6 +84,11 @@ class Account {
     })
   }
 
+/**
+  * @desc Validates for a strong password
+  * @param pass - password passed by the user <** correct? **>
+  * @returns {boolean} if password is valid returns true, false otherwise
+*/
   validatePassword (pass) {
     var numbers = pass.match(/\d+/g)
     var uppers = pass.match(/[A-Z]/)
@@ -81,8 +107,6 @@ class Account {
 module.exports = {
   Account
 }
-
-
 
 
 // login (username, password) {
