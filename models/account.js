@@ -1,10 +1,7 @@
 const db = require('./database')
 const bcrypt = require('bcrypt')
-<<<<<<< HEAD
-=======
 const score = require('./score')
 const saltRounds = 10
->>>>>>> 51615448f67b60cce39a0f352ad9d1b636eeb0f5
 
 class Account {
   constructor (username = undefined, password = undefined, userID = undefined) {
