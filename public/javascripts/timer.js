@@ -3,7 +3,7 @@
 	Copyright 2006-2010, Dean Edwards
 	License: http://www.opensource.org/licenses/mit-license.php
 */
-var startMyTimer = function(){
+let startMyTimer = function(){
 	var clock = $('.clock').FlipClock(10, {
 		clockFace: 'Counter',
 		countdown: true,
