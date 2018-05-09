@@ -15,10 +15,14 @@
                     <!--<p>Enter a username to begin</p>-->
                 <!--</div>-->
                 <div id="greetBoxUsernameInputWrap">
-                    <input name="user_name" class="cards" id="greetBoxUsernameInput" placeholder="Enter a username" onkeypress="login(event);"/>
+                    <input name="user_name" class="cards" id="greetBoxUsernameInput" placeholder="Enter a username" playWithoutLoggingIn="login(event);"/>
                 </div>
                 <div id="greetBoxStartButtonWrap">
+<<<<<<< HEAD
                     <div class="cards buttons greetBoxButtons" id="greetBoxStartButton" onclick="playWithoutLoggingIn(); startMyTimer();" onkeypress="playWithoutLoggingIn(event);">BEGIN</div>
+=======
+                    <div class="cards buttons greetBoxButtons" id="greetBoxStartButton" onclick="playWithoutAccount();" onkeypress="playWithoutAccount(event);">BEGIN</div>
+>>>>>>> 51615448f67b60cce39a0f352ad9d1b636eeb0f5
                 </div>
             </div>
             {{> questionView}}

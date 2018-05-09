@@ -1,18 +1,24 @@
 const db = require('./database')
 const bcrypt = require('bcrypt')
+<<<<<<< HEAD
+=======
+const score = require('./score')
+const saltRounds = 10
+>>>>>>> 51615448f67b60cce39a0f352ad9d1b636eeb0f5
 
 class Account {
-  constructor () {
-    this.username = undefined
-    this.password = undefined
-    this.userID = undefined
+  constructor (username = undefined, password = undefined, userID = undefined) {
+    this.username = username
+    this.password = password
+    this.userID = userID
+    this.currentScore = new score.Score()
   }
 
   /**
    * @desc Provide desc later
    * @param username - user's username
    * @param password - user's password
-   * @returns {undefined}
+   * @returns {Promise<object>}
    */
   login (username, password) {
     console.log(username)
@@ -29,16 +35,8 @@ class Account {
     })
   }
 
-  // decrypPassword (password) {
-  //   return new Promise((resolve, reject) => {
-  //     bcrypt.compare(password, hash).then((res) => {
-  //     // res == true
-  //     })
-  //   })
-  // }
-
   /**
-   * @desc Encrypts user's password 
+   * @desc Encrypts user's password
    * @param password - user's password
    * @returns {Promise<object>}
    */
@@ -52,9 +50,9 @@ class Account {
 
   /**
    * @desc Registration of the user in the database
-   * @param username - user's username 
+   * @param username - user's username
    * @param password - user's password
-   * @returns {Promise<object>} 
+   * @returns {Promise<object>}
    */
   register (username, password) {
     return new Promise((resolve, reject) => {
@@ -67,14 +65,23 @@ class Account {
     })
   }
 
-/**
-   * @desc [To be determined]
-   * @returns {undefined}
+  toJSON () {
+    return {
+      'username': this.username,
+      'password': this.password,
+      'userID': this.userID,
+      'currentScore': this.currentScore.toJSON()
+    }
+  }
+
+  /**
+   * @desc <provide description>
+   * @param {string} USERNAME - User's username
+   * @returns {Promise<object>}
    */
   validateUsername (USERNAME) {
     return new Promise((resolve, reject) => {
       db.executeQuery('SELECT "USERNAME" FROM "ACCOUNTS"').then((result) => {
-        console.log(result)
         let userArray = JSON.parse(result)
         var found = userArray.some(function (el) {
           return el.USERNAME === USERNAME
@@ -84,17 +91,17 @@ class Account {
     })
   }
 
-/**
+  /**
   * @desc Validates for a strong password
   * @param pass - password passed by the user <** correct? **>
   * @returns {boolean} if password is valid returns true, false otherwise
 */
   validatePassword (pass) {
-    var numbers = pass.match(/\d+/g)
-    var uppers = pass.match(/[A-Z]/)
-    var lowers = pass.match(/[a-z]/)
-    var lengths = pass.length >= 6
-    var valid = undefined
+    let numbers = pass.match(/\d+/g)
+    let uppers = pass.match(/[A-Z]/)
+    let lowers = pass.match(/[a-z]/)
+    let lengths = pass.length >= 6
+    let valid = undefined
 
     if (numbers === null || uppers === null || lowers === null || lengths === false) valid = false
 
@@ -107,24 +114,3 @@ class Account {
 module.exports = {
   Account
 }
-
-
-// login (username, password) {
-//   console.log(username)
-//   console.log(password)
-//   return new Promise((resolve, reject) => {
-//     this.encryptPassword(password).then((result) => {
-//       db.executeQuery(`SELECT * FROM public."ACCOUNTS";`).then((queryResult) => {
-//         for (let i; i < queryResult.length; i++) {
-//           if (queryResult[i].USERNAME == username && bcrypt.compareSync(queryResult[i].PASSWORD, result)) {
-//             this.username = queryResult[0].USERNAME
-//             this.password = queryResult[0].PASSWORD
-//             this.userID = queryResult[0].ACCOUNT_ID
-//             resolve(true)
-//           }
-//         }
-//       })
-//       resolve(false)
-//     })
-//   })
-// }
