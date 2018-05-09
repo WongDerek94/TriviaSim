@@ -18,11 +18,10 @@
                     <input name="user_name" class="cards" id="greetBoxUsernameInput" placeholder="Enter a username" playWithoutLoggingIn="login(event);"/>
                 </div>
                 <div id="greetBoxStartButtonWrap">
-                    <div class="cards buttons greetBoxButtons" id="greetBoxStartButton" onclick="playWithoutAccount(); startMyTimer();" onkeypress="playWithoutAccount(event);">BEGIN</div>
+                    <div class="cards buttons greetBoxButtons" id="greetBoxStartButton" onclick="playWithoutAccount();" onkeypress="playWithoutAccount(event);">BEGIN</div>
                 </div>
             </div>
             {{> questionView}}
-            {{> timer}}
             {{> popup}}
             {{> notify}}
         </div>

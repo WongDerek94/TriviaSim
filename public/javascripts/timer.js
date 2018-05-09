@@ -4,13 +4,13 @@
 	License: http://www.opensource.org/licenses/mit-license.php
 */
 let startMyTimer = function(){
-	var clock = $('.clock').FlipClock(10, {
+	let clock = $('.clock').FlipClock(10, {
 		clockFace: 'Counter',
 		countdown: true,
 		autoStart: true
-	});
-	return clock;
-}
+		})
+	return clock
+};
 
 var Base = function() {
 	// dummy
