@@ -7,9 +7,12 @@ let startMyTimer = function(){
 	let clock = $('.clock').FlipClock(10, {
 		clockFace: 'Counter',
 		countdown: true,
-		autoStart: true
-		})
-	return clock
+		autoStart: true,
+		stop: function(){
+			clock.reset()
+			getNextQuestion()
+		}
+	})
 };
 
 var Base = function() {
