@@ -71,11 +71,7 @@ let playWithoutLoggingIn = (event = 1) => {
   if (event === 1 || event.keyCode === 13) {
     if (userName.value !== '') {
       let xmlhttp = new XMLHttpRequest()
-<<<<<<< HEAD
-      xmlhttp.open('POST', '/loginWithOutAccount', true)
-=======
       xmlhttp.open('POST', '/loginWithoutAccount', true)
->>>>>>> cecbb2eaad124681164e944ad2ebe2ef7d8e0d18
       xmlhttp.setRequestHeader(
         'Content-type',
         'application/x-www-form-urlencoded'

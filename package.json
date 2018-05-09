@@ -20,9 +20,11 @@
   "dependencies": {
     "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
+    "bourbon": "^5.0.0",
     "cookie-session": "^2.0.0-beta.3",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
+    "flipclock": "^0.8.2",
     "hbs": "^4.0.1",
     "lodash": "^4.17.5",
     "pg": "^7.4.1",
@@ -31,12 +33,7 @@
     "sweetalert": "^2.1.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "babel-jest": "^22.4.3",
-    "babel-preset-env": "^1.6.1",
-=======
     "@types/jest": "^22.2.3",
->>>>>>> cecbb2eaad124681164e944ad2ebe2ef7d8e0d18
     "install": "^0.11.0",
     "jest": "^22.4.3",
     "jest-cli": "^22.4.3",
