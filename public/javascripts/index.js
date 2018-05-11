@@ -16,15 +16,13 @@ let popupMessageStreak = document.getElementById('popupMessageStreak')
 let notification = document.getElementById('notify')
 let notifyTitle = document.getElementById('notify_title')
 let notifyWrap = document.getElementById('wrap')
+let questionType = document.getElementById('trivia_category')
 
 let currentQuestion = {}
 let userObject = {}
 
 let assessQuestionResult = (chosenAnswer) => {
-  let xmlhttp = new XMLHttpRequest()
-  xmlhttp.open('POST', '/validateanswer', true)
-  xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-  xmlhttp.onreadystatechange = () => {
+  serverRequest('POST', '/validateanswer', `chosenAnswer=${chosenAnswer}`, (xmlhttp) => {
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
       let xmlhttpResult = JSON.parse(xmlhttp.responseText)
       userObject = xmlhttpResult.currentUser
@@ -35,21 +33,18 @@ let assessQuestionResult = (chosenAnswer) => {
       }
       populatePopupResult()
     }
-  }
-  xmlhttp.send(`chosenAnswer=${chosenAnswer}`)
+  })
 }
 
 let storeQuizResult = () => {
   questionViewWrap.style.top = '-100vh'
-  let xmlhttp = new XMLHttpRequest()
-  xmlhttp.open('POST', '/storeuser', true)
-  xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-  xmlhttp.onreadystatechange = () => {
-    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-      console.log(xmlhttp.responseText)
+  serverRequest('POST', '/storeuser', '', (xmlhttp) => {
+    if (xmlhttp.readyState === 4 && xmlhttp.status === 201) {
+      swal('Success', 'Your score has been saved!', 'success')
+    } else {
+      swal('Error', 'Unknown error!', 'error')
     }
-  }
-  xmlhttp.send()
+  })
   notifyWrap.style.display = 'block'
   notification.style.right = '0'
   setTimeout(() => {
@@ -68,23 +63,16 @@ let storeQuizResult = () => {
 let playWithoutAccount = (event = 1) => {
   if (event === 1 || event.keyCode === 13) {
     if (userName.value !== '') {
-      let xmlhttp = new XMLHttpRequest()
-      xmlhttp.open('POST', '/playWithoutAccount', true)
-      xmlhttp.setRequestHeader(
-        'Content-type',
-        'application/x-www-form-urlencoded'
-      )
-      xmlhttp.onreadystatechange = () => {
+      serverRequest('POST', '/playWithoutAccount', `username=${userName.value}`, (xmlhttp) => {
         if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
           notifyTitle.innerHTML = `Welcome ${userName.value}`
           document.getElementById('tooltip').style.backgroundImage = 'url(/assets/images/icons/puzzle.svg)'
           userObject = JSON.parse(xmlhttp.responseText)
           startTrivia()
         }
-      }
-      xmlhttp.send(`username=${userName.value}`)
+      })
     } else {
-      swal('Error!', 'You left the username blank!', 'warning')
+      swal('Error!', 'You left the username or category blank!', 'warning')
     }
   }
 }
@@ -102,10 +90,7 @@ let populatePopupResult = () => {
  * @desc function displays the next question or the result when the game is over
  */
 let getNextQuestion = () => {
-  let xmlhttp = new XMLHttpRequest()
-  xmlhttp.open('POST', '/getnextquestion', true)
-  xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-  xmlhttp.onreadystatechange = () => {
+  serverRequest('POST', '/getnextquestion', '', (xmlhttp) => {
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
       currentQuestion = JSON.parse(xmlhttp.responseText)
       displayQuestion()
@@ -116,19 +101,15 @@ let getNextQuestion = () => {
     } else if (xmlhttp.readyState === 4 && xmlhttp.status === 204) {
       storeQuizResult()
     }
-  }
-  xmlhttp.send()
+  })
 }
 
 /**
- * @desc Opens new HTTP request and looks for POST "/getquestions", if there is a state change, then it will parse into a JSON object which is displayed back to the user in the greet Box which only shows for 0.3 seconds then dissapears
- *
+ * @desc Opens new HTTP request and looks for POST "/getquestions", if there is a state change, then it will parse into a JSON object which is displayed back to the user in the greet Box which only shows for 0.3 seconds then dissapears. Send quiz category value to back end.
+ * 
  */
 let startTrivia = () => {
-  let xmlhttp = new XMLHttpRequest()
-  xmlhttp.open('POST', '/starttrivia', true)
-  xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-  xmlhttp.onreadystatechange = () => {
+  serverRequest('POST', '/starttrivia', '', (xmlhttp) => {
     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
       currentQuestion = JSON.parse(xmlhttp.responseText)
       displayQuestion()
@@ -137,8 +118,7 @@ let startTrivia = () => {
         greetBox.style.display = 'none'
       }, 300)
     }
-  }
-  xmlhttp.send()
+  })
 }
 /**
  * @desc Displays a game question
@@ -162,7 +142,6 @@ let displayQuestion = () => {
     setTimeout(() => {
       notifyWrap.style.display = 'none'
     }, 300)
-    startMyTimer()
   }, 1200)
 }
 

@@ -82,24 +82,69 @@ app.get('/', (request, response) => {
   response.render('index.hbs')
 })
 
+/**
+ * @desc TBD
+ */
+app.post('/checkLoginStatus', (request, response) => {
+  let sessionID = request.session.id.toString()
+  if (Object.keys(playingUsers).includes(sessionID) && playingUsers[sessionID].user.userID !== undefined) {
+    response.send(playingUsers[sessionID].user.toJSON())
+  } else {
+    response.sendStatus(403)
+  }
+})
+
+/**
+ * @desc If the user exists logs him in
+ * @param {Object} request - Node.js request object
+ * @param {Object} response - Node.js response object
+ */
+app.post('/login', (request, response) => {
+  let username = request.body.username
+  let password = request.body.password
+  let userAccount = new account.Account()
+  userAccount.login(username, password).then((result) => {
+    if (result) {
+      let sessionID = request.session.id.toString()
+      playingUsers[sessionID] = {}
+      playingUsers[sessionID].user = userAccount
+      response.sendStatus(200)
+    } else {
+      response.sendStatus(406)
+    }
+  })
+})
+
+/**
+ * @desc TBD
+ */
+app.post('/logout', (request, response) => {
+  let sessionID = request.session.id.toString()
+  delete playingUsers[sessionID]
+  response.sendStatus(200)
+})
+
 app.post('/storeuser', (request, response) => {
   let sessionID = request.session.id.toString()
   if (Object.keys(playingUsers).includes(sessionID)) {
-    let userList = new users.Users()
-    let userObject = playingUsers[sessionID].user
-    userList.storeUser(userObject)
-    delete playingUsers[sessionID]
-    console.log(playingUsers)
-    response.send('Quiz result stored successfully!')
+    if (playingUsers[sessionID].user !== undefined && playingUsers[sessionID].user.userID !== undefined) {
+      playingUsers[sessionID].user.saveCurrentScore().then((result) => {
+        response.sendStatus(201)
+      }).catch((error) => {
+        console.log(error)
+        response.sendStatus(400)
+      })
+    } else {
+      response.sendStatus(401)
+    }
   } else {
-    response.send('Unable to store quiz result!')
+    response.sendStatus(403)
   }
 })
 
 app.post('/playWithoutAccount', (request, response) => {
   let sessionID = request.session.id.toString()
   let newUser = new account.Account(request.body.username)
-  // let newUser = new users.User(request.body.username)
   playingUsers[sessionID] = {}
   playingUsers[sessionID].user = newUser
   response.send(newUser.toJSON())
@@ -118,7 +163,9 @@ app.get('/leaderboard', (request, response) => {
 })
 
 /**
- *
+ * @desc Function sends post request for the next question, responds with question object or a number indicating reason for a failure
+ * @param {Object} request - Node.js request object contains session data
+ * @param {Object} response - Node.js response object, responds with question object or a number indicating reason for a failure
  */
 app.post('/getnextquestion', (request, response) => {
   let sessionID = request.session.id.toString()
@@ -132,29 +179,37 @@ app.post('/getnextquestion', (request, response) => {
         delete playingUsers[sessionID].user
         response.sendStatus(204)
       }
+    } else {
+      response.sendStatus(401)
     }
   } else {
-    response.sendStatus(500)
+    response.sendStatus(403)
   }
 })
 
+/**
+ * @desc If user has session ID then create new question with chosen question type, else sends 500 to indicate that an interal server error occured.
+ * @param {Object} request - Node.js request object
+ * @param {Object} response - Node.js response object
+ */
 app.post('/starttrivia', (request, response) => {
   let sessionID = request.session.id.toString()
   if (Object.keys(playingUsers).includes(sessionID)) {
     let newQuestions = new questions.Questions()
     playingUsers[sessionID].questions = newQuestions
-    newQuestions.getQuestions().then((result) => {
+    console.log(request.body.chosenType)
+    newQuestions.getQuestions(10, request.body.chosenType).then((result) => {
       response.send(playingUsers[sessionID].questions.minimalquestionsList[playingUsers[sessionID].questions.currentQuestion])
     })
   } else {
-    response.sendStatus(500)
+    response.sendStatus(403)
   }
 })
 
 /**
- * @desc If user has session ID sends result object to the server, else sends 400 to indicate that an error occured
- * @param {Object} request - Node.js request object
- * @param {Object} response - Node.js response object
+ * @desc Function sends post request to the server, if user has session ID responds with result object, else responds with 400 to indicate that an error occured
+ * @param {Object} request - Node.js request object contains session data
+ * @param {Object} response - Node.js response object, responds with questionObject, or with 400 if error occured
  */
 app.post('/validateanswer', (request, response) => {
   let sessionID = request.session.id.toString()
@@ -169,7 +224,7 @@ app.post('/validateanswer', (request, response) => {
     )
     response.send(result)
   } else {
-    response.send(400)
+    response.send(403)
   }
 })
 /**
@@ -181,8 +236,6 @@ app.get('/about', (request, response) => {
   response.render('about.hbs')
 })
 
-
-
 /**
  * @desc Renders Sign Up page
  * @param {Object} request - Node.js request object
@@ -190,6 +243,10 @@ app.get('/about', (request, response) => {
  */
 app.get('/register', (request, response) => {
   response.render('register.hbs')
+})
+
+app.get('/profile', (request, response) => {
+  response.render('profile.hbs')
 })
 
 /**
@@ -202,17 +259,17 @@ app.get('*', (request, response) => {
 })
 
 /**
- * @desc If username is valid sends true to the server, else false
- * @param {Object} request - Node.js request object
- * @param {Object} response - Node.js response object
+ * @desc Functions sends post request to the server containing username, if username is valid responds with true, else responds with false
+ * @param {Object} request - Node.js request object, contains username
+ * @param {Object} response - Node.js response object, responds with true if username is valid, else false
  */
 app.post('/validateusername', (request, response) => {
   let userAccount = new account.Account()
   userAccount.validateUsername(request.body.USERNAME.toString()).then((result) => {
     if (result) {
-      response.send(true)
+      response.sendStatus(200)
     } else {
-      response.send(false)
+      response.sendStatus(406)
     }
   })
 })
@@ -221,12 +278,17 @@ app.post('/validatepassword', (request, response) => {
   let userAccount = new account.Account()
   let result = userAccount.validatePassword(request.body.PASSWORD.toString())
   if (result) {
-    response.send(true)
+    response.sendStatus(200)
   } else {
-    response.send(false)
+    response.sendStatus(406)
   }
 })
 
+/**
+ * @desc Function sends post request to register user, responds with true for success, else with false
+ * @param {Object} request - Node.js request object contains account data
+ * @param {Object} response - Node.js response object, responds with true for success, else with false
+ */
 app.post('/register', (request, response) => {
   let USERNAME = request.body.USERNAME.toString()
   let PASSWORD = request.body.PASSWORD.toString()
@@ -240,29 +302,7 @@ app.post('/register', (request, response) => {
         response.send(finalResult)
       })
     } else {
-      response.send(false)
-    }
-  })
-})
-
-/**
- * @desc If the user exists logs him in 
- * @param {Object} request - Node.js request object
- * @param {Object} response - Node.js response object
- */
-app.post('/login', (request, response) => {
-  let username = request.body.username
-  let password = request.body.password
-  let userAccount = new account.Account()
-  userAccount.login(username, password).then((result) => {
-    console.log(result)
-    if (result) {
-      let sessionID = request.session.id.toString()
-      playingUsers[sessionID] = {}
-      playingUsers[sessionID].user = userAccount
-      response.send({
-        'userObject': userAccount
-      })
+      response.sendStatus(406)
     }
   })
 })
