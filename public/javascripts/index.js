@@ -166,8 +166,6 @@ let startTrivia = () => {
   })
 }
 
-<<<<<<< HEAD
-=======
 // Set Final Value for Countdown Timer
 var countDownTo = 0;
 
@@ -179,23 +177,30 @@ var countDown = () => {
 	document.getElementById("clockDisplay").innerHTML = startCountDownAt;
 
 	if(startCountDownAt === countDownTo){
-		return startCountDownAt
+      startCountDownAt = 10;
+      clearInterval(timer);
+      getNextQuestion();
 	}
 
 	// Decrement Current Countdown Value
-	startCountDownAt -= 1;
+  startCountDownAt -= 1;
+  console.log('sasa')
 }
 
+var timer;
+var countDownTimer = () => {
+  clearInterval(timer);
+  timer = setInterval(countDown, 1000);
+}
 
-var countDownTimer = setInterval(countDown, 1000)
-
->>>>>>> master
 /**
  * @desc Displays a game question
  */
 let displayQuestion = () => {
   notifyWrap.style.display = 'block'
   questionViewWrap.style.top = '-100vh'
+  startCountDownAt = 10
+  countDownTimer()
   setTimeout(() => {
     notification.style.right = '0'
   }, 1)
@@ -212,14 +217,7 @@ let displayQuestion = () => {
     setTimeout(() => {
       notifyWrap.style.display = 'none'
     }, 300)
-  // var countDownTimer = setInterval(function(){
-  //   if(countDown() === 0){
-  //     startCountDownAt = 10;
-  //     clearInterval(countDownTimer)
-  //     getNextQuestion()
-  //   }
-  // }, 1000)
-  }, 1200)
+  }, 1000)
 }
 
 /**
