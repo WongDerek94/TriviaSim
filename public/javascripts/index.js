@@ -120,6 +120,28 @@ let startTrivia = () => {
     }
   })
 }
+
+// Set Final Value for Countdown Timer
+var countDownTo = 0;
+
+// Get Starting Value of Countdown Timer
+var startCountDownAt = 10;
+
+var countDown = () => {
+	// Display the result in the element with id="clockDisplay"
+	document.getElementById("clockDisplay").innerHTML = startCountDownAt;
+
+	if(startCountDownAt === countDownTo){
+		return startCountDownAt
+	}
+
+	// Decrement Current Countdown Value
+	startCountDownAt -= 1;
+}
+
+
+var countDownTimer = setInterval(countDown, 1000)
+
 /**
  * @desc Displays a game question
  */
@@ -142,6 +164,13 @@ let displayQuestion = () => {
     setTimeout(() => {
       notifyWrap.style.display = 'none'
     }, 300)
+  // var countDownTimer = setInterval(function(){
+  //   if(countDown() === 0){
+  //     startCountDownAt = 10;
+  //     clearInterval(countDownTimer)
+  //     getNextQuestion()
+  //   }
+  // }, 1000)
   }, 1200)
 }
 

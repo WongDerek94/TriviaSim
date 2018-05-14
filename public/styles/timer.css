@@ -1,6 +1,11 @@
-.clock{
+#clockDisplay{
   position:absolute;
   margin:auto;
-  left:45%;
+  display:block;
+  height:10%;
+  width:100%;
+  left:0px;
+  right:0px;
   top:20x;
+  text-align:center;
 }
