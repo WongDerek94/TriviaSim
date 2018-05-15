@@ -184,7 +184,6 @@ var countDown = () => {
 
 	// Decrement Current Countdown Value
   startCountDownAt -= 1;
-  console.log('sasa')
 }
 
 var timer;
