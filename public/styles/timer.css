@@ -6,7 +6,49 @@
   width:100%;
   left:0px;
   right:0px;
-  top:20x;
+  top:60px;
   text-align:center;
 }
 
+/* .wrapper {
+  width: 250px;
+  height: 250px;
+  margin:auto;
+  position: absolute;
+  top:70px;
+  background: white;
+}
+
+.pie {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  background: #08C;
+  border: 10px solid rgba(0,0,0,0.4);
+}
+
+.spinner {
+  border-radius: 125px 0 0 125px;
+  z-index: 200;
+  border-right: none;
+  animation: rota 10s linear infinite;
+}
+
+.filler {
+  border-radius: 0 125px 125px 0;
+  z-index: 100;
+  border-left: none;
+  animation: fill 10s steps(1, end) infinite;
+  left: 50%;
+  opacity: 0;
+}
+
+.mask {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  z-index: 300;
+  opacity: 1;
+  background: inherit;
+  animation: mask 10s steps(1, end) infinite;
+} */
