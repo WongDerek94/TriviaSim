@@ -1,5 +1,6 @@
 #clockDisplay{
   position:absolute;
+  top:5px;
   width:100%;
   text-align:center;
 }
@@ -11,7 +12,7 @@
 }
 
 #progressBar {
-  width: 10%;
+  width:0%;
   height: 30px;
   background-color: rgb(122, 32, 32);
   text-align: center;

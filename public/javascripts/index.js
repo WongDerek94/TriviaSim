@@ -172,8 +172,6 @@ let startTrivia = () => {
 let displayQuestion = () => {
   notifyWrap.style.display = 'block'
   questionViewWrap.style.top = '-100vh'
-  startCountDownAt = 9
-  width = 0
   countDownTimer()
   moveBar()
   setTimeout(() => {
