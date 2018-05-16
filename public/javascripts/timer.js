@@ -16,6 +16,32 @@
 // 	startCountDownAt -= 1;
 // }
 
+// Set Final Value for Countdown Timer
+var countDownTo = 0;
+
+// Get Starting Value of Countdown Timer
+var startCountDownAt = 9;
+
+var countDown = () => {
+	// Display the result in the element with id="clockDisplay"
+	document.getElementById("clockDisplay").innerHTML = startCountDownAt;
+
+	if(startCountDownAt === countDownTo){
+      startCountDownAt = 9;
+      clearInterval(timer);
+      getNextQuestion();
+	}
+
+	// Decrement Current Countdown Value
+  startCountDownAt -= 1;
+}
+
+var timer;
+var countDownTimer = () => {
+  clearInterval(timer);
+  timer = setInterval(countDown, 1000);
+}
+
 var id;
 
 function moveBar() {
