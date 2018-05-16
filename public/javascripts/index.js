@@ -170,14 +170,14 @@ let startTrivia = () => {
 var countDownTo = 0;
 
 // Get Starting Value of Countdown Timer
-var startCountDownAt = 10;
+var startCountDownAt = 9;
 
 var countDown = () => {
 	// Display the result in the element with id="clockDisplay"
 	document.getElementById("clockDisplay").innerHTML = startCountDownAt;
 
 	if(startCountDownAt === countDownTo){
-      startCountDownAt = 10;
+      startCountDownAt = 9;
       clearInterval(timer);
       getNextQuestion();
 	}
@@ -192,14 +192,17 @@ var countDownTimer = () => {
   timer = setInterval(countDown, 1000);
 }
 
+
 /**
  * @desc Displays a game question
  */
 let displayQuestion = () => {
   notifyWrap.style.display = 'block'
   questionViewWrap.style.top = '-100vh'
-  startCountDownAt = 10
+  startCountDownAt = 9
+  width = 0
   countDownTimer()
+  moveBar()
   setTimeout(() => {
     notification.style.right = '0'
   }, 1)

@@ -15,3 +15,21 @@
 // 	// Decrement Current Countdown Value
 // 	startCountDownAt -= 1;
 // }
+
+var id;
+
+function moveBar() {
+	var elem = document.getElementById("progressBar"); 
+	var width = 0;
+	clearInterval(id)
+    id = setInterval(frame, 50);
+    function frame() {
+        if (width >= 100) {
+            clearInterval(id);
+        } else {
+            width += .5; 
+            elem.style.width = width + '%'; 
+        }
+    }
+}
+
