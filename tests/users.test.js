@@ -47,7 +47,7 @@ afterEach(() => {
 
 describe('Testing class instances in users.js', () => {
   it('creates new User instance with valid parameters', () => {
-    expect(typeof userInst.username).toBe('string')
+    expect(userInst.username).toBe('string')
     expect(typeof userInst.userScore).toBe('number')
     expect(typeof userInst.currentStreak).toBe('number')
     expect(typeof userInst.highestStreak).toBe('number')
