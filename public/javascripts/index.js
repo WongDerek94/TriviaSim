@@ -180,7 +180,8 @@ let getNextQuestion = () => {
         animation: false,
         customClass: 'animated tada'
       }).then((doBonus) => {
-        if (doBonus) {
+        console.log(doBonus.value)
+        if (doBonus.value) {
           playBonus()
         } else {
           storeQuizResult()
@@ -280,7 +281,7 @@ let displayNotification = (mode, answer) => {
   let beer = 'url(/assets/images/icons/beer.svg)'
   let timeUp = 'url(/assets/images/icons/hourglass.svg)'
   if (mode === 'wrong') {
-    notifyTitle.innerHTML = '<div> Wrong! Right Answer Is\n' + answer + '</div>'
+    notifyTitle.innerHTML = 'Wrong! :('
     document.getElementById('tooltip').style.backgroundImage = thumbDown
   } else if (mode === 'right') {
     notifyTitle.innerHTML = 'Good Job! :)'

@@ -5,8 +5,8 @@ const express = require('express')
 const hbs = require('hbs')
 const bodyParser = require('body-parser')
 const _ = require('lodash')
-const users = require('./models/users')
 const questions = require('./controllers/questions')
+const opentdb = require('./models/opentdb')
 
 const score = require('./models/score')
 
@@ -71,7 +71,10 @@ app.use((request, response, next) => {
     let date = new Date()
     request.session.id = date.getTime().toString()
   }
-  next()
+  opentdb.retrieveToken().then(token => {
+    request.session.token = token
+    next()
+  })
 })
 
 /**
@@ -156,7 +159,9 @@ app.post('/storeuser', (request, response) => {
   if (Object.keys(playingUsers).includes(sessionID)) {
     if (playingUsers[sessionID].user !== undefined &&
       playingUsers[sessionID].user.userID !== undefined) {
-      playingUsers[sessionID].user.saveCurrentScore().then(result => {
+      playingUsers[sessionID].user.saveCurrentScore(
+        playingUsers[sessionID].questions.categoryID,
+        playingUsers[sessionID].questions.difficultyID).then(result => {
         response.sendStatus(201)
       }).catch(error => {
         response.sendStatus(400)
@@ -212,10 +217,7 @@ app.post('/play', (request, response) => {
  * for the leader board page
  */
 app.get('/leaderboard', (request, response) => {
-  let userList = new users.Users()
-  response.render('leaderboard.hbs', {
-    list_of_user_data: userList.displayTopUsers()
-  })
+  response.render('leaderboard.hbs')
 })
 
 /**
@@ -228,12 +230,9 @@ app.get('/leaderboard', (request, response) => {
  */
 app.post('/leaderboardCategory', (request, response) => {
   let newScore = new score.Score()
-  newScore.getLeaderboardStats(
-    request.body.chosenCategory,
-    request.body.chosenDifficulty)
-    .then(result => {
-      response.send(result)
-    })
+  newScore.getLeaderboardStats(request.body.chosenCategory, request.body.chosenDifficulty).then(result => {
+    response.send(result)
+  })
 })
 
 /**
@@ -250,14 +249,27 @@ app.post('/leaderboardCategory', (request, response) => {
  */
 app.post('/getnextquestion', (request, response) => {
   let sessionID = request.session.id.toString()
-  let minQuestions = playingUsers[sessionID].questions.currentQuestion
   if (Object.keys(playingUsers).includes(sessionID)) {
     if (playingUsers[sessionID].questions !== undefined) {
-      if (playingUsers[sessionID].questions.currentQuestion < 9) {
+      if (playingUsers[sessionID].questions.currentQuestion < playingUsers[sessionID].questions.questionsListLength - 1) {
+        let questionsObject = playingUsers[sessionID].questions
+        let currIdx = questionsObject.currentQuestion
+        let answerIdx = `option${questionsObject.questionsList[currIdx].answers}`
+        playingUsers[sessionID].currentReview.push([
+          questionsObject.questionsList[currIdx].question,
+          questionsObject.questionsList[currIdx][answerIdx]
+        ])
         playingUsers[sessionID].questions.currentQuestion++
         response.send(
-          playingUsers[sessionID].questions.minimalQuestionsList[minQuestions])
-      } else if (minQuestions === 9) {
+          playingUsers[sessionID].questions.minimalQuestionsList[playingUsers[sessionID].questions.currentQuestion])
+      } else if (playingUsers[sessionID].questions.currentQuestion === playingUsers[sessionID].questions.questionsListLength - 1) {
+        let questionsObject = playingUsers[sessionID].questions
+        let currIdx = questionsObject.currentQuestion
+        let answerIdx = `option${questionsObject.questionsList[currIdx].answers}`
+        playingUsers[sessionID].currentReview.push([
+          questionsObject.questionsList[currIdx].question,
+          questionsObject.questionsList[currIdx][answerIdx]
+        ])
         response.sendStatus(204)
       } else {
         response.sendStatus(401)
@@ -283,7 +295,7 @@ app.post('/getbonusquestion', (request, response) => {
   let sessionID = request.session.id.toString()
   if (Object.keys(playingUsers).includes(sessionID)) {
     if (playingUsers[sessionID].questions !== undefined) {
-      if (playingUsers[sessionID].questions.currentQuestion === 9) {
+      if (playingUsers[sessionID].questions.currentQuestion === playingUsers[sessionID].questions.questionsListLength - 1) {
         userQuestions.getRandomQuestions().then((result) => {
           let bonusQuestion = JSON.parse(result)[0]
           let answerArray = _.shuffle([
@@ -299,9 +311,9 @@ app.post('/getbonusquestion', (request, response) => {
             'option4': answerArray[3],
             'answers': _.indexOf(answerArray, bonusQuestion.RIGHT_ANSWER) + 1
           })
-          let i = playingUsers[sessionID].questions.minimalQuestionsList.length
+          let i = playingUsers[sessionID].questions.questionsListLength
           playingUsers[sessionID].questions.minimalQuestionsList.push({
-            'index': playingUsers[sessionID].questions.minimalQuestionsList.length,
+            'index': playingUsers[sessionID].questions.questionsListLength,
             'question': playingUsers[sessionID].questions.questionsList[i].question,
             'option1': playingUsers[sessionID].questions.questionsList[i].option1,
             'option2': playingUsers[sessionID].questions.questionsList[i].option2,
@@ -345,13 +357,15 @@ app.post('/starttrivia', (request, response) => {
     playingUsers[sessionID].questions = newQuestions
     let minQuestID = playingUsers[sessionID].questions.currentQuestion
     newQuestions.getQuestions(
+      request.session.token,
       10,
       request.body.chosenType,
-      request.body.chosenDiff).then((result) => {
-      response.send(
-        playingUsers[sessionID].questions.minimalQuestionsList[minQuestID]
-      )
-    })
+      request.body.chosenDiff)
+      .then((result) => {
+        response.send(
+          playingUsers[sessionID].questions.minimalQuestionsList[minQuestID]
+        )
+      })
   } else {
     response.sendStatus(403)
   }
@@ -381,12 +395,6 @@ app.post('/validateanswer', (request, response) => {
       questionsObject.currentQuestion,
       request.body.chosenAnswer
     )
-    let currIdx = questionsObject.currentQuestion
-    let answerIdx = `option${questionsObject.questionsList[currIdx].answers}`
-    playingUsers[sessionID].currentReview.push([
-      questionsObject.questionsList[currIdx].question,
-      questionsObject.questionsList[currIdx][answerIdx]
-    ])
     response.send(result)
   } else {
     response.send(403)
@@ -416,7 +424,13 @@ app.get('/about', (request, response) => {
  * @response {String} Filename of register.hbs file
  */
 app.get('/register', (request, response) => {
-  response.render('register.hbs')
+  let sessionID = request.session.id.toString()
+  if (Object.keys(playingUsers).includes(sessionID) &&
+    playingUsers[sessionID].user.userID !== undefined) {
+    response.redirect('/')
+  } else {
+    response.render('register.hbs')
+  }
 })
 
 /**
@@ -427,7 +441,35 @@ app.get('/register', (request, response) => {
  * @response {String} Filename of profile.hbs file
  */
 app.get('/profile', (request, response) => {
-  response.render('profile.hbs')
+  let sessionID = request.session.id.toString()
+  if (Object.keys(playingUsers).includes(sessionID) &&
+    playingUsers[sessionID].user.userID !== undefined) {
+    response.render('profile.hbs')
+  } else {
+    response.render('404.hbs')
+  }
+})
+
+app.post('/playerhistory', (request, response) => {
+  let sessionID = request.session.id.toString()
+  if (Object.keys(playingUsers).includes(sessionID)) {
+    playingUsers[sessionID].user.userPlayHistory().then((result) => {
+      response.send(result)
+    })
+  } else {
+    response.send(403)
+  }
+})
+
+app.post('/createdquestions', (request, response) => {
+  let sessionID = request.session.id.toString()
+  if (Object.keys(playingUsers).includes(sessionID)) {
+    playingUsers[sessionID].user.getCreatedQuestions().then((result) => {
+      response.send(result)
+    })
+  } else {
+    response.send(403)
+  }
 })
 
 /**
@@ -514,9 +556,9 @@ app.post('/validatepassword', (request, response) => {
  * @code {406} Not acceptable if RegEX does not pass
  */
 app.post('/register', (request, response) => {
-  let USERNAME = request.body.USERNAME.toString()
-  let PASSWORD = request.body.PASSWORD.toString()
-  let CPASSWORD = request.body.CPASSWORD.toString()
+  let USERNAME = request.body.USERNAME
+  let PASSWORD = request.body.PASSWORD
+  let CPASSWORD = request.body.CPASSWORD
   let userAccount = new account.Account()
 
   userAccount.validateUsername(USERNAME).then((result) => {
@@ -546,7 +588,7 @@ app.post('/register', (request, response) => {
  *
  * @body {String} questionContent
  * @body {String} rightAnswer
- * @body {String} wrongAnser1
+ * @body {String} wrongAnswer1
  * @body {String} wrongAnswer2
  * @body {String} wrongAnswer3
  *
@@ -561,6 +603,9 @@ app.post('/createQuestion', (request, response) => {
   let wrongAnswer3 = request.body.wrongAnswer3.toString()
   let sessionID = request.session.id.toString()
   let userID = playingUsers[sessionID].user.userID
+  let date = new Date()
+  let timeStamp = `${date.toLocaleDateString('en-CA')} 
+      ${date.toLocaleTimeString('en-CA')}`
 
   userQuestions.createQuestion(
     questionContent,
@@ -568,7 +613,8 @@ app.post('/createQuestion', (request, response) => {
     wrongAnswer1,
     wrongAnswer2,
     wrongAnswer3,
-    userID
+    userID,
+    timeStamp
   ).then((result) => {
     if (result) {
       response.sendStatus(200)
@@ -576,6 +622,22 @@ app.post('/createQuestion', (request, response) => {
       response.sendStatus(406)
     }
   })
+})
+
+app.post('/createQuiz', (request, response) => {
+  let sessionID = request.session.id.toString()
+  let userID = playingUsers[sessionID].user.userID
+  let date = new Date()
+  let timeStamp = `${date.toLocaleDateString('en-CA')} 
+      ${date.toLocaleTimeString('en-CA')}`
+  let selectedQuestions = JSON.parse(request.body.questionList)
+  if (Object.keys(playingUsers).includes(sessionID)) {
+    userQuestions.createCustomQuiz(userID, request.body.quizName, timeStamp, selectedQuestions).then((result) => {
+      response.sendStatus(200)
+    })
+  } else {
+    response.sendStatus(403)
+  }
 })
 
 app.listen(port, () => {

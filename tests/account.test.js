@@ -7,13 +7,10 @@ beforeAll(() => {
   return undefined
 })
 
-afterAll(() => {
-  db.executeQuery(`DELETE FROM public."ACCOUNTS" WHERE "USERNAME" IN (
-  'jestUser1',
-  'tester1',
-  'tester2',
-  'tester3'
-  );`)
+afterAll(async () => {
+  await db.executeQuery(
+    `DELETE FROM public."ACCOUNTS" WHERE "USERNAME" IN ($1, $2, $3, $4);`,
+    ['jestUser1', 'tester1', 'tester2', 'tester3'])
 })
 
 beforeEach(() => {
@@ -199,8 +196,28 @@ describe('Test encryptPassword()', () => {
   test('unencrypted password should not equal encrypted', async () => {
     await accInst.encryptPassword('Hello1').then(result => {
       expect(result).not.toBe('Hello1')
-    }).catch(error => {
-      console.log(error)
     })
+  })
+})
+
+describe('Test userPlayHistory()', () => {
+  test('display string is empty for a valid user with no play history', async () => {
+    accInst.userID = 1
+    await accInst.userPlayHistory().then(result => {
+      expect(result).toBe('')
+    })
+  })
+
+  test('returns "Error" for an invalid user', async () => {
+    await accInst.userPlayHistory().then(result => {
+      expect(result).toBe('Error')
+    })
+  })
+})
+
+describe('Test userPlayHistory()', () => {
+  test('getCreatedQuestions()', async () => {
+    accInst.userID = 1
+    expect(await accInst.getCreatedQuestions()).toContain('<div class=\"round cards floatingButtons\" id=\"createQuestionButton\" onclick=\"showCreateQuestionWindow()\"></div>')
   })
 })

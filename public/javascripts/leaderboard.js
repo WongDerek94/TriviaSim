@@ -10,13 +10,10 @@ let scoreDisplay = document.getElementById('scoreDisplay')
  * @function
  */
 let displayQuizResultCateogry = () => {
-  let diffType = difficultyType.options[difficultyType.selectedIndex].value
-  let categType = categoryType.options[categoryType.selectedIndex].value
-  serverRequest(
-    'POST',
-    '/leaderboardCategory',
-    `chosenCategory=${categType}
-    &chosenDifficulty=${diffType}`, (xmlhttp) => {
+    serverRequest('POST', '/leaderboardCategory',
+    `chosenCategory=${categoryType.options[categoryType.selectedIndex].value}` +
+    `&chosenDifficulty=${difficultyType.options[difficultyType.selectedIndex].value}`,
+    (xmlhttp) => {
       if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
         scoreDisplay.innerHTML = '<div class="scoreDisplayRow scoreDisplayRowHeader">\n' +
                 '<div id="userRank" class="leaderboardDisplayColumn">\n' +
@@ -35,7 +32,6 @@ let displayQuizResultCateogry = () => {
                 '<p class="displayInfo">DATE</p>\n' +
                 '</div>\n' +
                 '</div>\n'
-        console.log(scoreDisplay.innerHTML)
         scoreDisplay.innerHTML += xmlhttp.responseText
       }
     })
